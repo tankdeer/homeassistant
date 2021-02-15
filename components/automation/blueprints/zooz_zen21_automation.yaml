@@ -1,0 +1,206 @@
+blueprint:
+  name: Zooz Zen21
+  description: Create automations for the Zooz Zen21 using the OZW integration. 
+  domain: automation
+  input:
+    zooz_switch:
+      name: Zooz Zen21 Switch
+      description: "List of available Zooz Zen21 switches to configure.
+      This list is only a reference. At this time, it is not possible
+      to obtain the node's id using the device selector."
+      selector:
+        entity:
+          domain: zwave
+    #   selector:
+    #     device:
+    #       product_name: ZEN21 Switch V2.0
+          
+    target_device:
+      name: Target Device
+      description: "Select the device that the automation is intended
+      to target. This is typically the light or light group which
+      is controlled by the switch."
+      selector:
+        entity: 
+          domain: light
+          
+    all_lights:
+      name: All Lights
+      description: "Select the light group containing all of the 
+      basement lights. This will be used to turn all lights on
+      and off."
+      selector:
+        entity: 
+          domain: light
+
+## Disabled - Default Action Defined Below
+    # on_1x:
+    #   name: Press On (1x)
+    #   description: Action to run on button press.
+    #   default: []
+    #   selector:
+    #     action: {}
+## Disabled - Default Action Defined Below
+    # on_2x:
+    #   name: Press On (2x)
+    #   description: Action to run on button press.
+    #   default: []
+    #   selector:
+    #     action: {}
+    on_3x:
+      name: Press On (3x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    on_4x:
+      name: Press On (4x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    on_5x:
+      name: Press On (5x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    on_held:
+      name: Press On (held)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+## Disabled - Default Action Defined Below
+    # off_1x:
+    #   name: Press Off (1x)
+    #   description: Action to run on button press.
+    #   default: []
+    #   selector:
+    #     action: {}
+## Disabled - Default Action Defined Below
+    # off_2x:
+    #   name: Press Off (2x)
+    #   description: Action to run on button press.
+    #   default: []
+    #   selector:
+    #     action: {}
+    off_3x:
+      name: Press Off (3x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    off_4x:
+      name: Press Off (4x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    off_5x:
+      name: Press Off (5x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    off_held:
+      name: Press Off (held)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+
+mode: single
+max_exceeded: silent
+
+variables:
+  device_id: !input zooz_switch
+#   ozw_node_id: !input ozw_node_id
+
+trigger:
+  - platform: event
+    event_type: zwave.scene_activated
+    event_data:
+      entity_id: !input zooz_switch
+
+action:
+  - variables:
+      scene_id: "{{ trigger.event.data.scene_id }}"
+      scene_data: "{{ trigger.event.data.scene_data }}"
+  - choose:
+    # Down 1x
+    - conditions: "{{ scene_id == 1 and scene_data == 7680}}"
+      sequence:
+        - choose:
+          - conditions:
+            - condition: state
+              entity_id: !input target_device
+              state: 'on'
+            sequence:
+              - service: light.turn_off
+                entity_id: !input target_device
+          - conditions:
+            - condition: state
+              entity_id: !input target_device
+              state: 'off'
+            sequence:
+              - service: light.turn_on
+                data:
+                  brightness_pct: 10
+                entity_id: !input target_device
+    # Up 1x
+    - conditions: "{{ scene_id == 2 and scene_data == 7680}}"
+      sequence:
+        - choose:
+          - conditions:
+            - condition: state
+              entity_id: !input target_device
+              state: 'off'
+            sequence:
+            - service: light.turn_on
+              entity_id: !input target_device
+          - conditions:
+            - condition: state
+              entity_id: !input target_device
+              state: 'on'
+            sequence:
+            - service: light.turn_on
+              data:
+                brightness_step_pct: 20
+              entity_id: !input target_device
+    # Down 2x
+    - conditions: "{{ scene_id == 1 and scene_data == 7860}}"
+      sequence: 
+        - service: light.turn_off
+          entity_id: !input all_lights
+    # Up 2x
+    - conditions: "{{ scene_id == 2 and scene_data == 7860}}"
+      sequence:
+        - service: light.turn_on
+          data:
+            brightness_pct: 100
+          entity_id: !input target_device
+    # Down 3x
+    - conditions: "{{ scene_id == 1 and scene_data == 7920}}"
+      sequence: !input off_3x
+    # Up 3x
+    - conditions: "{{ scene_id == 2 and scene_data == 7920}}"
+      sequence: !input on_3x
+    # Down 4x
+    - conditions: "{{ scene_id == 1 and scene_data == 7980}}"
+      sequence: !input off_4x
+    # Up 4x
+    - conditions: "{{ scene_id == 2 and scene_data == 7980}}"
+      sequence: !input on_4x
+    # Down 5x
+    - conditions: "{{ scene_id == 1 and scene_data == 8040}}"
+      sequence: !input off_5x
+    # Up 5x
+    - conditions: "{{ scene_id == 2 and scene_data == 8040}}"
+      sequence: !input on_5x
+    # Held Down
+    - conditions: "{{ scene_id == 1 and scene_data == 7800}}"
+      sequence: !input off_held
+    # Held Up
+    - conditions: "{{ scene_id == 2 and scene_data == 7800}}"
+      sequence: !input on_held
