@@ -1,20 +1,16 @@
 blueprint:
   name: Zooz Zen21
-  description: Create automations for the Zooz Zen21 using the OZW integration.
+  description: Create automations for the Zooz Zen21.
   source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen21_automation.yaml
   domain: automation
   input:
     zooz_switch:
       name: Zooz Zen21 Switch
-      description: "List of available Zooz Zen21 switches to configure.
-      This list is only a reference. At this time, it is not possible
-      to obtain the node's id using the device selector."
+      description: "List of available zwave devices to configure. Please
+      select the Zooz Zen Switch you want to setup."
       selector:
         entity:
           domain: zwave
-    #   selector:
-    #     device:
-    #       product_name: ZEN21 Switch V2.0
           
     target_device:
       name: Target Device
@@ -110,13 +106,24 @@ blueprint:
       default: []
       selector:
         action: {}
+    on_released:
+      name: Release On
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    off_released:
+      name: Release Off
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
 
 mode: single
 max_exceeded: silent
 
 variables:
   device_id: !input zooz_switch
-#   ozw_node_id: !input ozw_node_id
 
 trigger:
   - platform: event
@@ -205,3 +212,9 @@ action:
     # Held Up
     - conditions: "{{ scene_id == 2 and scene_data == 7800}}"
       sequence: !input on_held
+    # Released Down
+    - conditions: "{{ scene_id == 1 and scene_data == 7740}}"
+      sequence: !input off_released
+    # Released Up
+    - conditions: "{{ scene_id == 2 and scene_data == 7740}}"
+      sequence: !input on_released
