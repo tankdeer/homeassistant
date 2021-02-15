@@ -1,6 +1,7 @@
 blueprint:
   name: Zooz Zen21
-  description: Create automations for the Zooz Zen21 using the OZW integration. 
+  description: Create automations for the Zooz Zen21 using the OZW integration.
+  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen21_automation.yaml
   domain: automation
   input:
     zooz_switch:
