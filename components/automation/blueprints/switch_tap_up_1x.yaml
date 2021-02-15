@@ -15,9 +15,8 @@ blueprint:
       name: Light
       description: The light that will be adjusted
       selector:
-        target:
-          entity:
-            domain: light
+        entity:
+          domain: light
     brightness_step_pct_value:
       name: Brightness Step
       description: The percentage by which the light brightness will be increased each time
@@ -40,23 +39,21 @@ trigger:
     scene_id: 2
     scene_data: 7680
     
-variables:
-  target_entity: !input light_target
-  step_value: 
-
 action:
-  choose:
-    - conditions:
-      - condition: template
-        value_template: "{{ (states[target_entity].state == 'off') }}"
-      sequence:
-        service: light.turn_on
-        target: !input light_target
-    - conditions:
-      - condition: template
-        value_template: "{{ (states[target_entity].state == 'on') }}"
-      sequence:
-        service: light.turn_on
-        target: !input light_target
-        data:
-          brightness_step_pct: !input brightness_step_pct_value
+  - choose:
+      - conditions:
+          - condition: state
+            entity_id: !input light_target
+            state: 'off'
+        sequence:
+          - service: light.turn_on
+            entity_id: !input light_target
+      - conditions:
+          - condition: state
+            entity_id: !input light_target
+            state: 'on'
+        sequence:
+          - service: light.turn_on
+            data:
+              brightness_step_pct: !input brightness_step_pct_value
+            entity_id: !input light_target
