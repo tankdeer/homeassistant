@@ -1,14 +1,16 @@
 blueprint:
   name: Switch Tap Up 1x
-  description: Turn on a light when switch tapped up 1x or turn up of already on.
+  description: Turn on a light when switch tapped up 1x or turn up of already on
   domain: automation
+  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/switch_tap_up_1x.yaml
+
   input:
     switch_entity:
       name: Switch
       description: The Zooz Zen 21 Switch being used to trigger the automation
-      selector: 
+      selector:
         entity:
-          domain: switch
+          domain: zwave
     light_target:
       name: Light
       description: The light that will be adjusted
@@ -16,43 +18,45 @@ blueprint:
         target:
           entity:
             domain: light
-    brightness_step_pct:
+    brightness_step_pct_value:
       name: Brightness Step
       description: The percentage by which the light brightness will be increased each time
+      default: 20
       selector:
         number:
-          min: 1
-          max: 100
+          min: 1.0
+          max: 100.0
           unit_of_measurement: percent
+          step: 1.0
+          mode: slider
 
 mode: single
-#max_exceeded: silent
-  
+
 trigger:
-  - platform: event
-    event_type: zwave.scene_activated
-    event_data:
-      entity_id: !input switch_entity
-      scene_id: 2
-      scene_data: 7680
+  platform: event
+  event_type: zwave.scene_activated
+  event_data:
+    entity_id: !input switch_entity
+    scene_id: 2
+    scene_data: 7680
+    
+variables:
+  target_entity: !input light_target
+  step_value: 
 
 action:
-  - choose:
-      - conditions:
-          - condition: state
-            entity_id: !input light_target
-            state: 'Off'
-        sequence:
-          - service: light.turn_on
-            data: {}
-            entity_id: !input light_target
-      - conditions:
-          - condition: state
-            entity_id: !input light_target
-            state: 'on'
-        sequence:
-          - service: light.turn_on
-            data:
-              brightness_step_pct: 10
-            entity_id: !input light_target
-    default: []
+  choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ (states[target_entity].state == 'off') }}"
+      sequence:
+        service: light.turn_on
+        target: !input light_target
+    - conditions:
+      - condition: template
+        value_template: "{{ (states[target_entity].state == 'on') }}"
+      sequence:
+        service: light.turn_on
+        target: !input light_target
+        data:
+          brightness_step_pct: !input brightness_step_pct_value
