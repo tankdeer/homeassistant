@@ -131,7 +131,7 @@ trigger:
     event_type: zwave_js_event
     event_data:
       command_class_name: Central Scene
-      entity_id: !input zooz_switch
+      device_id: !input zooz_switch
 
 action:
   - variables:
