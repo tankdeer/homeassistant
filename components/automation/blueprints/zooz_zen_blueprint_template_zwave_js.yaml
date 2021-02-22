@@ -1,7 +1,7 @@
 blueprint:
-  name: Zooz Zen21
-  description: Create automations for the Zooz Zen21.
-  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen21_automation.yaml
+  name: Zooz Zen21 (zwave_js)
+  description: Create automations for the Zooz Zen21 updated for zwave_js
+  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen_blueprint_template_zwave_js.yaml
   domain: automation
   input:
     zooz_switch:
@@ -162,56 +162,56 @@ action:
                         brightness_pct: 10
                       entity_id: !input target_device
           - conditions: "{{ scene_value == 'KeyPressed2x' }}"
-              sequence:
-                - service: light.turn_off
-                  entity_id: !input all_lights
+            sequence:
+              - service: light.turn_off
+                entity_id: !input all_lights
           - conditions: "{{ scene_value == 'KeyPressed3x' }}"
-              sequence: !input down_3x
+            sequence: !input down_3x
           - conditions: "{{ scene_value == 'KeyPressed4x' }}"
-              sequence: !input down_4x
+            sequence: !input down_4x
           - conditions: "{{ scene_value == 'KeyPressed5x' }}"
-              sequence: !input down_5x
+            sequence: !input down_5x
           - conditions: "{{ scene_value == 'KeyHeldDown' }}"
-              sequence: !input down_held
+            sequence: !input down_held
           - conditions: "{{ scene_value == 'KeyReleased' }}"
-              sequence: !input down_released
+            sequence: !input down_released
               
     # Key Press Up
     - conditions: "{{ scene_id == 'Scene 002' }}"
       sequence:
         - choose:
           - conditions: "{{ scene_value == 'KeyPressed' }}"
-              sequence:
-                - choose:
-                  - conditions:
-                    - condition: state
-                      entity_id: !input target_device
-                      state: 'off'
-                    sequence:
-                    - service: light.turn_on
-                      entity_id: !input target_device
-                  - conditions:
-                    - condition: state
-                      entity_id: !input target_device
-                      state: 'on'
-                    sequence:
-                    - service: light.turn_on
-                      data:
-                        brightness_step_pct: 20
-                      entity_id: !input target_device
+            sequence:
+              - choose:
+                - conditions:
+                  - condition: state
+                    entity_id: !input target_device
+                    state: 'off'
+                  sequence:
+                  - service: light.turn_on
+                    entity_id: !input target_device
+                - conditions:
+                  - condition: state
+                    entity_id: !input target_device
+                    state: 'on'
+                  sequence:
+                  - service: light.turn_on
+                    data:
+                      brightness_step_pct: 20
+                    entity_id: !input target_device
           - conditions: "{{ scene_value == 'KeyPressed2x' }}"
-              sequence:
-                - service: light.turn_on
-                  data:
-                    brightness_pct: 100
-                  entity_id: !input target_device
+            sequence:
+              - service: light.turn_on
+                data:
+                  brightness_pct: 100
+                entity_id: !input target_device
           - conditions: "{{ scene_value == 'KeyPressed3x' }}"
-              sequence: !input up_3x
+            sequence: !input up_3x
           - conditions: "{{ scene_value == 'KeyPressed4x' }}"
-              sequence: !input up_4x
+            sequence: !input up_4x
           - conditions: "{{ scene_value == 'KeyPressed5x' }}"
-              sequence: !input up_5x
+            sequence: !input up_5x
           - conditions: "{{ scene_value == 'KeyHeldDown' }}"
-              sequence: !input up_held
+            sequence: !input up_held
           - conditions: "{{ scene_value == 'KeyReleased' }}"
-              sequence: !input up_released
+            sequence: !input up_released
