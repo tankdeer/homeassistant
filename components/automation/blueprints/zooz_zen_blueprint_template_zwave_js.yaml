@@ -1,6 +1,6 @@
 blueprint:
   name: Zooz Zen21 (zwave_js)
-  description: Create automations for the Zooz Zen21 updated for zwave_js. Up 1x and 2x presses have been set to control the target device and cannot be set to custom actions. Single press will toggle on and off. A single press down, while the device is off will set the target to 20% brightness. A double press up will set the target to 100% brightness.
+  description: Create automations for the Zooz Zen21 updated for zwave_js.
   source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen_blueprint_template_zwave_js.yaml
   domain: automation
   input:
@@ -26,6 +26,18 @@ blueprint:
       selector:
         entity:
           domain: light
+    up_1x:
+      name: Press On (1x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    up_2x:
+      name: Press On (2x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
     up_3x:
       name: Press On (3x)
       description: Action to run on button press.
@@ -52,6 +64,18 @@ blueprint:
         action: {}
     up_released:
       name: Release On
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    down_1x:
+      name: Press Off (1x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    down_2x:
+      name: Press Off (2x)
       description: Action to run on button press.
       default: []
       selector:
@@ -105,28 +129,9 @@ action:
     sequence:
     - choose:
       - conditions: '{{ scene_value == ''KeyPressed'' }}'
-        sequence:
-        - choose:
-          - conditions:
-            - condition: state
-              entity_id: !input 'target_device'
-              state: 'on'
-            sequence:
-            - service: light.turn_off
-              entity_id: !input 'target_device'
-          - conditions:
-            - condition: state
-              entity_id: !input 'target_device'
-              state: 'off'
-            sequence:
-            - service: light.turn_on
-              data:
-                brightness_pct: 10
-              entity_id: !input 'target_device'
+        sequence: !input 'down_1x'
       - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
-        sequence:
-        - service: light.turn_off
-          entity_id: !input 'all_lights'
+        sequence: !input 'down_2x'
       - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
         sequence: !input 'down_3x'
       - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
@@ -141,30 +146,9 @@ action:
     sequence:
     - choose:
       - conditions: '{{ scene_value == ''KeyPressed'' }}'
-        sequence:
-        - choose:
-          - conditions:
-            - condition: state
-              entity_id: !input 'target_device'
-              state: 'off'
-            sequence:
-            - service: light.turn_on
-              entity_id: !input 'target_device'
-          - conditions:
-            - condition: state
-              entity_id: !input 'target_device'
-              state: 'on'
-            sequence:
-            - service: light.turn_on
-              data:
-                brightness_step_pct: 20
-              entity_id: !input 'target_device'
+        sequence: !input 'up_1x'        
       - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
-        sequence:
-        - service: light.turn_on
-          data:
-            brightness_pct: 100
-          entity_id: !input 'target_device'
+        sequence: !input 'up_2x'
       - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
         sequence: !input 'up_3x'
       - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
