@@ -1,0 +1,86 @@
+blueprint:
+  name: Motion Activated Light with Timer and Scene Restore
+  description: This automation will use a motion sensor to detect motion and activate a light. When the motion stops, a cooldown timer is started. If the timer reaches zero before additional motion is detected, the light will be restored to the pre-motion state.
+  domain: automation
+  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/motion_light_timer_restore.yaml
+
+  input:
+    light_target:
+      name: Light
+      description: The light(s) that will be activated when motion is detected
+      selector:
+        entity:
+          domain: light
+    motion_trigger:
+      name: Motion Sensor
+      description: The motion sensor that will be used to trigger the automation
+    cooldown_period:
+      name: Cooldown Timer (Minutes)
+      description: The time (in minutes) to wait until the original state of the light is restored
+      default: 15
+      selector:
+        number:
+          min: 1
+          unit_of_measurement: minutes
+          step: 1
+    brightness_day:
+      description: Select the brightness (%) you wish to set the lights to during the day
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: % brightness
+          step: 1
+          mode: slider
+    brightness_night:
+      description: Select the brightness (%) you wish to set the lights to during the night
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: % brightness
+          step: 1
+          mode: slider
+  variables:
+    var_scene_name: >-
+      {% set x = 'abcdefghijklmnopqrstuvwxyz' %} {% set ns =
+      namespace(name='blueprint_motion_') %} {% for i in range(15)  %}   {% set
+      ns.name = ns.name + x | random %} {% endfor %} {{ns.name}}  
+  trigger:
+    - type: motion
+      entity_id: !input motion_trigger
+  action:
+    - service: scene.create
+      data:
+        scene_id: !variables var_scene_name
+        snapshot_entities: !input light_target
+    - choose:
+        - conditions:
+            - condition: numeric_state
+              entity_id: sun.sun
+              attribute: elevation
+              above: 10
+          sequence:
+            - service: light.turn_on
+              target:
+                entity_id: !input light_target
+              data:
+                brightness_pct: !input brightness_day
+      default:
+        - service: light.turn_on
+          target:
+            entity_id: !input light_target
+          data:
+            brightness_pct: !input brightness_night
+    - wait_for_trigger:
+        - type: no_motion
+          entity_id: !input motion_trigger
+          for:
+            hours: 0
+            minutes: !input cooldown_period
+            seconds: 0
+            milliseconds: 0
+      continue_on_timeout: false
+    - scene: !variables var_scene_name
