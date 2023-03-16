@@ -1,7 +1,7 @@
 blueprint:
-  name: Zooz Zen21 (zwave_js)
-  description: Create automations for the Zooz Zen21 updated for zwave_js.
-  source_url: https://github.com/willheineman/homeassistant/blob/main/components/automation/blueprints/zooz_zen_blueprint_template_zwave_js.yaml
+  name: Zooz Zen21 - Control Lights
+  description: Create light controlling automations for the Zooz Zen21 updated for zwave_js.
+  source_url: https://github.com/tankdeer/homeassistant/edit/main/components/automation/blueprints/zooz_zen_blueprint_template_zwave_js.yaml
   domain: automation
   input:
     zooz_switch:
