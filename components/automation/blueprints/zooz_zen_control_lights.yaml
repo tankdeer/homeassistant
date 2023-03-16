@@ -12,20 +12,20 @@ blueprint:
         device:
           integration: zwave_js
           manufacturer: Zooz
-    target_device:
-      name: Individual Lights
-      description: Select the lights that the automation is intended to target.
-      selector:
-        entity:
-          domain: light
-          multiple: true
-    all_lights:
-      name: All Lights
-      description: Select the light group containing all of the lights. This
-        will be used to turn all lights on and off.
-      selector:
-        entity:
-          domain: light
+#     target_device:
+#       name: Individual Lights
+#       description: Select the lights that the automation is intended to target.
+#       selector:
+#         entity:
+#           domain: light
+#           multiple: true
+#     all_lights:
+#       name: All Lights
+#       description: Select the light group containing all of the lights. This
+#         will be used to turn all lights on and off.
+#       selector:
+#         entity:
+#           domain: light
     up_1x:
       name: Press On (1x)
       description: Action to run on button press.
