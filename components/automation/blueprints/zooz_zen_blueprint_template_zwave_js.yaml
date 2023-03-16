@@ -21,7 +21,7 @@ blueprint:
           domain: light
     all_lights:
       name: All Lights
-      description: Select the light group containing all of the basement lights. This
+      description: Select the light group containing all of the lights. This
         will be used to turn all lights on and off.
       selector:
         entity:
