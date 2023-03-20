@@ -143,12 +143,12 @@ trigger:
   trigger_id: switch_on
   type: turned_on
   device_id: !input 'zooz_switch'
-  entity_id: '{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}'
+  entity_id: "{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}"
 - platform: device
   trigger_id: switch_off
   type: turned_off
   device_id: !input 'zooz_switch'
-  entity_id: '{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}'
+  entity_id: "{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}"
 action:
 -if:
   - if:
