@@ -26,6 +26,18 @@ blueprint:
 #       selector:
 #         entity:
 #           domain: light
+    ui_on:
+      name: Press On (1x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    ui_off:
+      name: Press On (1x)
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
     up_1x:
       name: Press On (1x)
       description: Action to run on button press.
@@ -64,6 +76,12 @@ blueprint:
         action: {}
     up_released:
       name: Release On
+      description: Action to run on button press.
+      default: []
+      selector:
+        action: {}
+    ui_off:
+      name: Press On (1x)
       description: Action to run on button press.
       default: []
       selector:
@@ -116,46 +134,74 @@ variables:
   device_id: !input 'zooz_switch'
 trigger:
 - platform: event
+  trigger_id: event
   event_type: zwave_js_value_notification
   event_data:
     command_class_name: Central Scene
     device_id: !input 'zooz_switch'
+- platform: device
+  trigger_id: switch_on
+  type: turned_on
+  device_id: !input 'zooz_switch'
+  entity_id: '{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}'
+- platform: device
+  trigger_id: switch_off
+  type: turned_off
+  device_id: !input 'zooz_switch'
+  entity_id: '{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}'
 action:
-- variables:
-    scene_id: '{{ trigger.event.data.label }}'
-    scene_value: '{{ trigger.event.data.value }}'
-- choose:
-  - conditions: '{{ scene_id == ''Scene 001'' }}'
-    sequence:
-    - choose:
-      - conditions: '{{ scene_value == ''KeyPressed'' }}'
-        sequence: !input 'down_1x'
-      - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
-        sequence: !input 'down_2x'
-      - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
-        sequence: !input 'down_3x'
-      - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
-        sequence: !input 'down_4x'
-      - conditions: '{{ scene_value == ''KeyPressed5x'' }}'
-        sequence: !input 'down_5x'
-      - conditions: '{{ scene_value == ''KeyHeldDown'' }}'
-        sequence: !input 'down_held'
-      - conditions: '{{ scene_value == ''KeyReleased'' }}'
-        sequence: !input 'down_released'
-  - conditions: '{{ scene_id == ''Scene 002'' }}'
-    sequence:
-    - choose:
-      - conditions: '{{ scene_value == ''KeyPressed'' }}'
-        sequence: !input 'up_1x'        
-      - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
-        sequence: !input 'up_2x'
-      - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
-        sequence: !input 'up_3x'
-      - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
-        sequence: !input 'up_4x'
-      - conditions: '{{ scene_value == ''KeyPressed5x'' }}'
-        sequence: !input 'up_5x'
-      - conditions: '{{ scene_value == ''KeyHeldDown'' }}'
-        sequence: !input 'up_held'
-      - conditions: '{{ scene_value == ''KeyReleased'' }}'
-        sequence: !input 'up_released'
+-if:
+  - if:
+      - condition: or
+        conditions:
+          - condition: trigger
+            id: "turned_on"
+          - condition: trigger
+            id: "turned_off"
+    then:
+      - if:
+          - condition: trigger:
+            id: "turned_on"
+        then:
+          !input 'ui_on'
+        else:
+          !input 'ui_off'      
+    else:
+      - variables:
+          scene_id: '{{ trigger.event.data.label }}'
+          scene_value: '{{ trigger.event.data.value }}'
+      - choose:
+        - conditions: '{{ scene_id == ''Scene 001'' }}'
+          sequence:
+          - choose:
+            - conditions: '{{ scene_value == ''KeyPressed'' }}'
+              sequence: !input 'down_1x'
+            - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
+              sequence: !input 'down_2x'
+            - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
+              sequence: !input 'down_3x'
+            - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
+              sequence: !input 'down_4x'
+            - conditions: '{{ scene_value == ''KeyPressed5x'' }}'
+              sequence: !input 'down_5x'
+            - conditions: '{{ scene_value == ''KeyHeldDown'' }}'
+              sequence: !input 'down_held'
+            - conditions: '{{ scene_value == ''KeyReleased'' }}'
+              sequence: !input 'down_released'
+        - conditions: '{{ scene_id == ''Scene 002'' }}'
+          sequence:
+          - choose:
+            - conditions: '{{ scene_value == ''KeyPressed'' }}'
+              sequence: !input 'up_1x'        
+            - conditions: '{{ scene_value == ''KeyPressed2x'' }}'
+              sequence: !input 'up_2x'
+            - conditions: '{{ scene_value == ''KeyPressed3x'' }}'
+              sequence: !input 'up_3x'
+            - conditions: '{{ scene_value == ''KeyPressed4x'' }}'
+              sequence: !input 'up_4x'
+            - conditions: '{{ scene_value == ''KeyPressed5x'' }}'
+              sequence: !input 'up_5x'
+            - conditions: '{{ scene_value == ''KeyHeldDown'' }}'
+              sequence: !input 'up_held'
+            - conditions: '{{ scene_value == ''KeyReleased'' }}'
+              sequence: !input 'up_released'
