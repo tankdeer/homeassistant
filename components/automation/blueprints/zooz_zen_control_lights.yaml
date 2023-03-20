@@ -143,15 +143,18 @@ trigger:
   trigger_id: switch_on
   type: turned_on
   device_id: !input 'zooz_switch'
-  entity_id: >
-    "{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}"
+#   entity_id: >
+#     {%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}
 - platform: device
   trigger_id: switch_off
   type: turned_off
   device_id: !input 'zooz_switch'
-  entity_id: >
-    "{%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}"
+#   entity_id: >
+#     {%for entity in device_entities(!input 'zooz_switch') if 'switch.' in entity %}{{entity}}{%endfor%}
 action:
+- variables:
+    scene_id: '{{ trigger.event.data.label }}'
+    scene_value: '{{ trigger.event.data.value }}'
 -if:
   - if:
       - condition: or
@@ -169,9 +172,6 @@ action:
         else:
           !input 'ui_off'      
     else:
-      - variables:
-          scene_id: '{{ trigger.event.data.label }}'
-          scene_value: '{{ trigger.event.data.value }}'
       - choose:
         - conditions: '{{ scene_id == ''Scene 001'' }}'
           sequence:
