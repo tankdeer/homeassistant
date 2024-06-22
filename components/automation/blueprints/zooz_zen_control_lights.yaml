@@ -7,12 +7,15 @@ blueprint:
     zooz_switch:
       name: Zooz Zen21 Switch
       description: List of available zwave devices to configure. Please select the
-        Zooz Zen Switch you want to setup.
+        Zooz Zen Switch(s) you want to setup.
       selector:
         device:
-          integration: zwave_js
-          manufacturer: Zooz
           multiple: true
+          filter:
+            - integration: zwave_js
+              manufacturer: Zooz
+          entity:
+            - domain: switch
 #     target_device:
 #       name: Individual Lights
 #       description: Select the lights that the automation is intended to target.
