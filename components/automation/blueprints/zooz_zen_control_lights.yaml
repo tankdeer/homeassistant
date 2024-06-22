@@ -12,6 +12,7 @@ blueprint:
         device:
           integration: zwave_js
           manufacturer: Zooz
+          multiple: true
 #     target_device:
 #       name: Individual Lights
 #       description: Select the lights that the automation is intended to target.
